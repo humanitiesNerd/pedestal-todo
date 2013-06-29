@@ -37,7 +37,7 @@
 (defn todo-transform [state message]
   (case (msg/type message)
     msg/init (:value message)
-    :add (update-in state [:model-todos] conj (:value message))))
+    :add (update-in state [:model-todos] merge (:value message))))
 
 ;;;;;;;;;;;;;;
 ;; DATAFLOW ;;
@@ -90,7 +90,13 @@
     (dom/destroy-children! container)
     (doseq [new-todo new-value]
       (dom/append! container
-                   (str "<li>" (:text new-todo) " " (:id new-todo) "<button type=\"reset\" onclick=\"cancelEntry(this)\">Cancel</button> </li>")))))
+                   (str "<li>"
+                   (:text new-todo) 
+                   " <form>" 
+                   "<button type=\"button\" onclick=\"return false; \" id=\" "(:id new-todo)" \">
+                   Cancel
+                   </button></form> </li>"))
+    )))
 
 ; When the button is clicked, send a message to :todo topic to kick off the
 ; process.
