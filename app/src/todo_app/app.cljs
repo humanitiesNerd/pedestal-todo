@@ -52,6 +52,8 @@
 (defn todo-emit
   ([inputs] initial-app-model)
   ([inputs changed-inputs]
+  (.log js/console (str "inputs: " inputs))
+  (.log js/console (str "changed inputs: " changed-inputs))
     (reduce (fn [a input-name]
               (let [new-value (:new (get inputs input-name))]
                 (concat a (case input-name
