@@ -37,7 +37,7 @@
 (defn todo-transform [state message]
   (case (msg/type message)
     msg/init (:value message)
-    :add (update-in state [:model-todos] conj (:value message))))
+    :add (update-in state [:model-todos] merge (:value message))))
 
 ;;;;;;;;;;;;;;
 ;; DATAFLOW ;;
