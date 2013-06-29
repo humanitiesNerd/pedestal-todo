@@ -96,7 +96,8 @@
 ; process.
 (defn bind-todo-form [input-queue]
   (let [form (dom/by-id "todo-form")
-        btn (dom/by-id "todo-add-button")]
+        btn (dom/by-id "todo-add-button")
+       ]
     (.focus (dom/by-id "todo-entry"))
     (events/send-on :click
                     btn
@@ -105,7 +106,7 @@
                       (let [text-node (dom/by-id "todo-entry")
                             text (.-value text-node)]
                         (set! (.-value text-node) "")
-                        [{msg/topic :todo msg/type :add :value {:id 2, :text text}}])))))
+                        [{msg/topic :todo msg/type :add :value {(.getUTCMilliseconds (js/Date.)), text}}])))))
 
 (defn ^:export main []
   (let [app (app/build count-app)
