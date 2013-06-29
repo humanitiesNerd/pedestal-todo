@@ -91,7 +91,15 @@
     (dom/destroy-children! container)
     (doseq [new-todo new-value]
       (dom/append! container
-                   (str "<li>" (new-todo 1) "</li>")))))
+                   (str "<li>" (new-todo 1) "<form> <button id = \""(new-todo 1)"\"> Cancel </button> </form></li>"
+                   )
+
+      ))
+                   
+  
+
+
+  ))
 
 ; When the button is clicked, send a message to :todo topic to kick off the
 ; process.

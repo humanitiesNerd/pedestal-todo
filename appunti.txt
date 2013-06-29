@@ -1,5 +1,5 @@
 <button type="submit" onclick="return false;" id="todo-add-button">Add</button>
 
-<button type=\"reset\" onclick=\"cancelEntry(this)\">Cancel</button>
+<button type=\"submit\" onclick="return false;" id=\"\">Cancel</button>
 
  timestamp = new Date().getUTCMilliseconds();
