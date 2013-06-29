@@ -5,3 +5,4 @@
  timestamp = new Date().getUTCMilliseconds();
 
 (dissoc-in state [:model-todos (:value message)])
+(dissoc-in state [:model-todos (:value message)] )

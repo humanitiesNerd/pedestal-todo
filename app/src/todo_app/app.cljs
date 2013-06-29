@@ -24,23 +24,42 @@
             [io.pedestal.app.messages :as msg]
             [io.pedestal.app.render.events :as events]
             [domina.events :as dom-event]
-            [domina :as dom]))
+            [domina :as dom]
+            ))
 
 ;;;;;;;;;;;;;;;
 ;; TRANSFORM ;;
 ;;;;;;;;;;;;;;;
 
+
+
 ; This function updates the data model in response to a message. It will be 
 ; triggered whenever a message appears in the :todo topic. The only accepted 
 ; message in this implementation has type :add and :value corresponding to the 
 ; new todo text.
+
+(defn dissoc-in
+  "Dissociates an entry from a nested associative structure returning a new
+  nested structure. keys is a sequence of keys. Any empty maps that result
+  will not be present in the new structure."
+  [m [k & ks :as keys]]
+  (if ks
+    (if-let [nextmap (get m k)]
+      (let [newmap (dissoc-in nextmap ks)]
+        (if (seq newmap)
+          (assoc m k newmap)
+          (dissoc m k)))
+      m)
+    (dissoc m k)))
+
 (defn todo-transform [state message]
   (case (msg/type message)
     msg/init (:value message)
     :add (update-in state [:model-todos] merge (:value message))
-    :cancel  (.log js/console (str state " " (:value message) )) (dissoc-in state [:model-todos] (:value message))
+    ;:add (.log js/console (number? (first (keys (:value message)))))
+    ;:cancel (.log js/console (str (number? (:value message)) " " (number? (first (keys (get-in state [:model-todos])))) ))
+    :cancel (dissoc-in state [:model-todos (:value message)])
   )
-
 )
 
 ;;;;;;;;;;;;;;
@@ -58,8 +77,8 @@
   ;(.log js/console (str "primo caso, inputs: " inputs)) 
    initial-app-model)
   ([inputs changed-inputs]
-  ;(.log js/console (str "inputs: " inputs))
-  ;(.log js/console (str "changed inputs: " changed-inputs))
+  (.log js/console (str "inputs: " inputs))
+  (.log js/console (str "changed inputs: " changed-inputs))
     (reduce (fn [a input-name]
               (let [new-value (:new (get inputs input-name))]
                 (concat a (case input-name
@@ -89,8 +108,8 @@
 ;;;;;;;;;;;;;;;
 
 (defn bind-cancel-button [input-queue button-id]
-  (.log js/console (str "bind-cancel-button !! Button id " button-id))
-  (let [cancel-button (dom/by-id button-id)]
+  (.log js/console (str "bind-cancel-button !! Button id " button-id " " (number? button-id)))
+  (let [cancel-button (dom/by-id (str button-id))]
     (events/send-on :click
                     cancel-button
                     input-queue
@@ -114,7 +133,7 @@
                    (str "<li>" (new-todo 1) "<form> <button id = \""(new-todo 0)"\"> Cancel </button> </form></li>"
                    )
       )
-      (bind-cancel-button input-queue (str (new-todo 0)))
+      (bind-cancel-button input-queue (new-todo 0))
     )
   ))
 
