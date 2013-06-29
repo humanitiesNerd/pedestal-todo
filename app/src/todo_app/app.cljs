@@ -86,11 +86,12 @@
 ; DOM manipulation with Domina. I imagine it could instead be a bridge to 
 ; AngularJS.
 (defn render-todos [r [_ _ old-value new-value] input-queue]
+  (.log js/console new-vale)
   (let [container (dom/by-id "todo-list")]
     (dom/destroy-children! container)
     (doseq [new-todo new-value]
       (dom/append! container
-                   (str "<li>" new-todo "</li>")))))
+                   (str "<li>" (new-todo 1) "</li>")))))
 
 ; When the button is clicked, send a message to :todo topic to kick off the
 ; process.
