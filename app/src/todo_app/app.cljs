@@ -90,7 +90,7 @@
     (dom/destroy-children! container)
     (doseq [new-todo new-value]
       (dom/append! container
-                   (str "<li>" (:text new-todo) " " (:id new-todo) "</li>")))))
+                   (str "<li>" (:text new-todo) " " (:id new-todo) "<button type=\"reset\" onclick=\"cancelEntry(this)\">Cancel</button> </li>")))))
 
 ; When the button is clicked, send a message to :todo topic to kick off the
 ; process.
