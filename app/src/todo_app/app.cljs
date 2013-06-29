@@ -37,7 +37,11 @@
 (defn todo-transform [state message]
   (case (msg/type message)
     msg/init (:value message)
-    :add (update-in state [:model-todos] merge (:value message))))
+    :add (update-in state [:model-todos] merge (:value message))
+    :cancel  (.log js/console (str state " " (:value message) )) (dissoc-in state [:model-todos] (:value message))
+  )
+
+)
 
 ;;;;;;;;;;;;;;
 ;; DATAFLOW ;;
@@ -50,10 +54,12 @@
 
 ; This function generates change messages (deltas) for the application model.
 (defn todo-emit
-  ([inputs] (.log js/console (str "primo caso, inputs: " inputs)) initial-app-model)
+  ([inputs] 
+  ;(.log js/console (str "primo caso, inputs: " inputs)) 
+   initial-app-model)
   ([inputs changed-inputs]
-  (.log js/console (str "inputs: " inputs))
-  (.log js/console (str "changed inputs: " changed-inputs))
+  ;(.log js/console (str "inputs: " inputs))
+  ;(.log js/console (str "changed inputs: " changed-inputs))
     (reduce (fn [a input-name]
               (let [new-value (:new (get inputs input-name))]
                 (concat a (case input-name
@@ -75,30 +81,41 @@
 ; Initial state of the application model. It's always a single tree.
 (def ^:private initial-app-model
   [{:app
-    {:todos []}}])
+    {:todos []}}]
+)
 
 ;;;;;;;;;;;;;;;
 ;; RENDERING ;;
 ;;;;;;;;;;;;;;;
+
+(defn bind-cancel-button [input-queue button-id]
+  (.log js/console (str "bind-cancel-button !! Button id " button-id))
+  (let [cancel-button (dom/by-id button-id)]
+    (events/send-on :click
+                    cancel-button
+                    input-queue
+                    (fn []
+                        ;(.log js/console "button pressed !")
+                        [{msg/topic :todo msg/type :cancel :value button-id}]))
+  
+  )
+)
 
 ; Renderer for the todo list. In new-value it receives only the part of model 
 ; that it is listening to (the vector at [:app :todos]). Here it's doing some
 ; DOM manipulation with Domina. I imagine it could instead be a bridge to 
 ; AngularJS.
 (defn render-todos [r [_ _ old-value new-value] input-queue]
-  (.log js/console new-vale)
+  ;(.log js/console new-value)
   (let [container (dom/by-id "todo-list")]
     (dom/destroy-children! container)
     (doseq [new-todo new-value]
       (dom/append! container
-                   (str "<li>" (new-todo 1) "<form> <button id = \""(new-todo 1)"\"> Cancel </button> </form></li>"
+                   (str "<li>" (new-todo 1) "<form> <button id = \""(new-todo 0)"\"> Cancel </button> </form></li>"
                    )
-
-      ))
-                   
-  
-
-
+      )
+      (bind-cancel-button input-queue (str (new-todo 0)))
+    )
   ))
 
 ; When the button is clicked, send a message to :todo topic to kick off the
@@ -115,7 +132,9 @@
                       (let [text-node (dom/by-id "todo-entry")
                             text (.-value text-node)]
                         (set! (.-value text-node) "")
-                        [{msg/topic :todo msg/type :add :value {(.getUTCMilliseconds (js/Date.)), text}}])))))
+                        [{msg/topic :todo msg/type :add :value {(.getUTCMilliseconds (js/Date.)), text}}])))
+
+))
 
 (defn ^:export main []
   (let [app (app/build count-app)
