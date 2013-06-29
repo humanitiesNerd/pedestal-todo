@@ -50,7 +50,7 @@
 
 ; This function generates change messages (deltas) for the application model.
 (defn todo-emit
-  ([inputs] initial-app-model)
+  ([inputs] (.log js/console (str "primo caso, inputs: " inputs)) initial-app-model)
   ([inputs changed-inputs]
   (.log js/console (str "inputs: " inputs))
   (.log js/console (str "changed inputs: " changed-inputs))
